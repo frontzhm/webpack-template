@@ -343,3 +343,56 @@ module.exports = options
 
 总结下,现代浏览器都支持TrueType和Woff
 
+安装`npm i file-loader url-loader --save-dev`,在src里增加font文件夹和img文件夹,里面放上相应资源,然后在pug,js,css里引用
+这两个插件会将在css,html,js中相应的资源转化成相应路径
+
+[官方文档](https://doc.webpack-china.org/loaders/file-loader/)
+
+```js
+{
+  test: /\.(eot|svg|ttf|woff)$/,
+  use: {
+    loader: 'file-loader',
+    options: {
+      name: '[name].[ext]',
+      outputPath:'font/'
+      // 用于服务器
+      // publicPath: '/'
+    }
+  },
+  include: path.resolve(__dirname, 'src')
+},{
+  // 生成文件 file.png，输出到输出目录并返回 public URL
+  test: /\.(jpg|png|gif)$/,
+  use: {
+    loader: 'url-loader',
+    options: {
+      // name: '[path][hash][name].[ext]'
+      name: '[name].[ext]',
+      // 超过多少就不用base64
+      limit: 5000,
+      outputPath: 'img/'
+      // publicPath: '/'
+    }
+  },
+  include: path.resolve(__dirname, 'src')
+}
+
+```
+
+特别注意一点在css里引用图片路径可能会有问题,对此[解决方案,pspgbhu的回答](https://github.com/vuejs/vue-loader/issues/481)
+
+```js
+{
+      test: /\.css$/,
+      use: ExtractTextPlugin.extract({
+        // 没有塞进css文件的还是放到style标签
+        fallback: "style-loader",
+        use: [{ loader: 'css-loader', options: { importLoaders: 1 } },'postcss-loader'],
+        // 这样css中引用背景图片的时候 ../img/i.png而不是默认的./img/i.png
+        publicPath: '../'
+      }),
+      include: path.resolve(__dirname, 'src')
+    }
+```
+

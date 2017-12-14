@@ -1,5 +1,6 @@
-/* $red:red; */
+$red:red;
 body{
-  /* color:$red; */
+  color:$red;
   font-size: 30px;
+  background: url('./img/3.jpg')
 }

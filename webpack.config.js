@@ -42,7 +42,36 @@ var options = {
         // 没有塞进css文件的还是放到style标签
         fallback: "style-loader",
         use: [{ loader: 'css-loader', options: { importLoaders: 1 } },'postcss-loader'],
+        // 这样css中引用背景图片的时候 ../img/i.png而不是默认的./img/i.png
+        publicPath: '../'
       }),
+      include: path.resolve(__dirname, 'src')
+    },{
+      test: /\.(eot|svg|ttf|woff)$/,
+      use: {
+        loader: 'file-loader',
+        options: {
+          name: '[name].[ext]',
+          outputPath:'font/'
+          // 用于服务器
+          // publicPath: '/'
+        }
+      },
+      include: path.resolve(__dirname, 'src')
+    },{
+      // 生成文件 file.png，输出到输出目录并返回 public URL
+      test: /\.(jpg|png|gif)$/,
+      use: {
+        loader: 'url-loader',
+        options: {
+          // name: '[path][hash][name].[ext]'
+          name: '[name].[ext]',
+          // 超过多少就不用base64
+          limit: 5000,
+          outputPath: 'img/'
+          // publicPath: '/'
+        }
+      },
       include: path.resolve(__dirname, 'src')
     }
   ]
