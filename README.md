@@ -396,3 +396,14 @@ module.exports = options
     }
 ```
 
+## 每次生成dist前先清除
+
+```js
+// 每次运行命令的时候 先清除dist的其他文件
+const CleanWebpackPlugin = require('clean-webpack-plugin')
+// ...
+plugins:[
+  new CleanWebpackPlugin(['dist']),
+  // ...
+]
+```

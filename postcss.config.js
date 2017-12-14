@@ -3,7 +3,8 @@ module.exports = {
   plugins: {
     'postcss-import': {},
     'autoprefixer': {},
-    'postcss-cssnext': {},
+    // 个人用precss
+    // 'postcss-cssnext': {},
     'precss': {},
     'postcss-pxtorem': {
         // rootValue: 16,

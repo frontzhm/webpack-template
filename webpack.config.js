@@ -2,7 +2,9 @@ const path = require('path')
 // 这个插件会在 output.path下生成html文件 默认生成的文件名是index.html,默认自动引入output.filename
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 // 分离css
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const ExtractTextPlugin = require("extract-text-webpack-plugin")
+// 每次运行命令的时候 先清除dist的其他文件
+const CleanWebpackPlugin = require('clean-webpack-plugin')
 
 var options = {
   entry: {
@@ -77,6 +79,7 @@ var options = {
   ]
   },
   plugins: [
+    new CleanWebpackPlugin(['dist']),
     new HtmlWebpackPlugin({
       template: 'src/index.pug',
       filename: 'index.html',
