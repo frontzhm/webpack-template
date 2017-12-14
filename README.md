@@ -407,3 +407,12 @@ plugins:[
   // ...
 ]
 ```
+
+## 增加source-map
+
+```js
+devtool: 'inline-source-map'
+```
+
+## 清除不必要的代码
+

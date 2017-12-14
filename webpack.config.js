@@ -92,6 +92,7 @@ var options = {
     }),
     // name就是chunk名,单入口可以定义,多入口可以这样的
     new ExtractTextPlugin('css/[name].css'),
-  ]
+  ],
+  devtool: 'inline-source-map'
 }
 module.exports = options
