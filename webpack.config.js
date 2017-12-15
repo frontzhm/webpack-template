@@ -97,6 +97,10 @@ var options = {
     // treeshaking
     new UglifyJSPlugin(),
   ],
-  devtool: 'inline-source-map'
+  devtool: 'inline-source-map',
+  // 设置本地服务器的根目录  webpack-dev-server --open  代码变动自动编译且没有生成dist
+  devServer: {
+    contentBase: './dist'
+  }
 }
 module.exports = options

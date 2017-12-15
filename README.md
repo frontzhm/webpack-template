@@ -427,3 +427,22 @@ plugins: [
 ]
 ```
 
+## 本地服务器实现代码改动自动编译,并且能够实时重新加载(live reloading
+
+webpack-dev-server为你提供了一个简单的 web 服务器，自动打开浏览器。且本地不生成dist文件夹.
+
+
+
+```js
+// 设置服务器的根目录
+devServer: {
+    contentBase: './dist'
+}
+```
+
+```js
+// 设置脚本
+"start": "webpack-dev-server --open",
+```
+
+运行`npm start`之后,我改了`index.pug`和`index.css`,`index.js`,其重新编译且浏览器自动刷新了
