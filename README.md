@@ -446,3 +446,21 @@ devServer: {
 ```
 
 运行`npm start`之后,我改了`index.pug`和`index.css`,`index.js`,其重新编译且浏览器自动刷新了
+
+## 模块热替换
+
+[HMR](https://doc.webpack-china.org/guides/hot-module-replacement/) 不适用于生产环境，这意味着它应当只在开发环境使用
+它允许在运行时更新各种模块，而无需进行完全刷新。(但是好像很多时候浏览器不显示改动的地方)
+
+```js
+devServer: {
+    contentBase: './dist',
+    hot: true
+},
+plugins: [
+    new webpack.NamedModulesPlugin(),
+    new webpack.HotModuleReplacementPlugin()
+],
+```
+
+运行命令之后,虽然重新编译了,页面也没有刷新,但是改动的地方也没显示...所以简单项目里就不想用热替换了,重新刷新就重新刷新呗.

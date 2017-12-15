@@ -7,6 +7,8 @@ const ExtractTextPlugin = require("extract-text-webpack-plugin")
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 // treeShaking
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
+const webpack = require('webpack')
+
 
 var options = {
   entry: {
@@ -96,11 +98,17 @@ var options = {
     new ExtractTextPlugin('css/[name].css'),
     // treeshaking
     new UglifyJSPlugin(),
+    // 热替换增加的地方2
+    new webpack.HotModuleReplacementPlugin(),
+    // 热替换增加的地方3 NamedModulesPlugin，以便更容易查看要修补(patch)的依赖
+    new webpack.NamedModulesPlugin()
   ],
   devtool: 'inline-source-map',
   // 设置本地服务器的根目录  webpack-dev-server --open  代码变动自动编译且没有生成dist
   devServer: {
-    contentBase: './dist'
+    contentBase: './dist',
+    // 热替换增加的地方1
+    hot: true
   }
 }
 module.exports = options
