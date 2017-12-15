@@ -41,7 +41,6 @@ module.exports = {
 };
 ```
 
-
 * 添加src/index.js,`console.log(0)`
 * 添加dist/index.html,  `.....<script src="index.bundle.js"></script>..`
 * webpack  `npm install webpack --save-dev` 在package.json配置脚本`webpack: "webpack"`
@@ -62,6 +61,30 @@ var options = {
   }
 }
 module.exports = options
+```
+
+## 使用es2015+的语法
+
+安装`npm install babel-loader babel-core babel-preset-env --save-dev`
+[文档](https://doc.webpack-china.org/loaders/babel-loader/)关于怎么优化的,不过暂时不考虑
+增加`.babelrc`
+
+```js
+{
+  "presets": ["env"]
+}
+```
+
+webpack.config.js使用
+
+```js
+{
+  test: /\.js$/,
+    use: {
+      loader: 'babel-loader'
+    },
+    include: path.resolve(__dirname, 'src')
+}
 ```
 
 ## html文件的生成
@@ -431,7 +454,11 @@ plugins: [
 
 webpack-dev-server为你提供了一个简单的 web 服务器，自动打开浏览器。且本地不生成dist文件夹.
 
-
+* 一个本地的服务器，用于通过http协议来访问 html/js/css 等资源，实现前后端分离。
+* 实现编译输出webpack打包后的文件，方便开发调试。
+* hot reload实现热替换，可以不刷新更新修改内容。
+* 可实现资源虚拟路径，修改源文件直接的相对关系。
+* 可实现本地的 proxy，因为本地server都是起在127.0.0.1的，可通过配置解决开发时接口跨域问题。
 
 ```js
 // 设置服务器的根目录
@@ -464,3 +491,5 @@ plugins: [
 ```
 
 运行命令之后,虽然重新编译了,页面也没有刷新,但是改动的地方也没显示...所以简单项目里就不想用热替换了,重新刷新就重新刷新呗.
+
+## 

@@ -24,6 +24,12 @@ var options = {
   },
   module: {
     rules:[{
+      test: /\.js$/,
+      use: {
+        loader: 'babel-loader'
+      },
+      include: path.resolve(__dirname, 'src')
+    },{
       test: /\.pug$/,
       use: ['html-loader',{
         loader: 'pug-html-loader',
@@ -97,18 +103,18 @@ var options = {
     // name就是chunk名,单入口可以定义,多入口可以这样的
     new ExtractTextPlugin('css/[name].css'),
     // treeshaking
-    new UglifyJSPlugin(),
+    new UglifyJSPlugin()
     // 热替换增加的地方2
-    new webpack.HotModuleReplacementPlugin(),
+    // new webpack.HotModuleReplacementPlugin(),
     // 热替换增加的地方3 NamedModulesPlugin，以便更容易查看要修补(patch)的依赖
-    new webpack.NamedModulesPlugin()
+    // new webpack.NamedModulesPlugin()
   ],
   devtool: 'inline-source-map',
   // 设置本地服务器的根目录  webpack-dev-server --open  代码变动自动编译且没有生成dist
   devServer: {
-    contentBase: './dist',
+    contentBase: './dist'
     // 热替换增加的地方1
-    hot: true
+    // hot: true
   }
 }
 module.exports = options
