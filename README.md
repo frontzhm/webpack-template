@@ -410,9 +410,20 @@ plugins:[
 
 ## 增加source-map
 
+一般开发环境使用
+
 ```js
 devtool: 'inline-source-map'
 ```
 
-## 清除不必要的代码
+## 清除不必要的代码(tree-shaking)
+
+一般发布环境使用,可以在压缩这边增加source-map,具体[参照官方文档](https://doc.webpack-china.org/plugins/uglifyjs-webpack-plugin)
+安装`npm i --save-dev uglifyjs-webpack-plugin`
+
+```js
+plugins: [
+  new UglifyJSPlugin()
+]
+```
 

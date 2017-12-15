@@ -5,6 +5,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ExtractTextPlugin = require("extract-text-webpack-plugin")
 // 每次运行命令的时候 先清除dist的其他文件
 const CleanWebpackPlugin = require('clean-webpack-plugin')
+// treeShaking
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 
 var options = {
   entry: {
@@ -92,6 +94,8 @@ var options = {
     }),
     // name就是chunk名,单入口可以定义,多入口可以这样的
     new ExtractTextPlugin('css/[name].css'),
+    // treeshaking
+    new UglifyJSPlugin(),
   ],
   devtool: 'inline-source-map'
 }
