@@ -492,4 +492,204 @@ plugins: [
 
 运行命令之后,虽然重新编译了,页面也没有刷新,但是改动的地方也没显示...所以简单项目里就不想用热替换了,重新刷新就重新刷新呗.
 
-## 
+## 生产和开发环境分离
+
+有些是只需要在开发的时候用的,为了方便所以需要分别配置生产和开发环境
+
+### 增加全局变量
+
+webpack自带的插件`DefinePlugin`在配置文件里,定义全局变量
+
+```js
+new webpack.DefinePlugin({
+  'process.env': {
+    'NODE_ENV': JSON.stringify('production')
+  }
+})
+```
+
+在我们自己的js里就可以
+
+```js
+if (process.env.NODE_ENV !== 'production') {
+  console.log('Looks like we are in development mode!');
+}
+```
+
+### 分离环境
+
+安装`npm install --save-dev webpack-merge`
+
+比如可以写三个文件,`webpack.common.js`,`webpack.dev.js`,`webpack.prod.js`
+
+```js
+// webpack.common.js
+const path = require('path')
+// 这个插件会在 output.path下生成html文件 默认生成的文件名是index.html,默认自动引入output.filename
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+
+var options = {
+  entry: {
+    index: path.resolve(__dirname, 'src/index.js'),
+    math: path.resolve(__dirname, 'src/math.js')
+  },
+  output: {
+    // 注意加引号
+    filename: 'js/[name].bundle.js',
+    // 目录下的dist
+    path: path.resolve(__dirname, 'dist')
+    // public
+  },
+  module: {
+    rules: [{
+      // pug
+      test: /\.pug$/,
+      use: ['html-loader', {
+        loader: 'pug-html-loader',
+        options: {
+          pretty: true,
+          data: {
+            name: 'lala'
+          }
+        }
+      }],
+      include: path.resolve(__dirname, 'src')
+    }, {
+      // 字体
+      test: /\.(eot|svg|ttf|woff)$/,
+      use: {
+        loader: 'file-loader',
+        options: {
+          name: '[name].[ext]',
+          outputPath: 'font/'
+          // 用于服务器
+          // publicPath: '/'
+        }
+      },
+      include: path.resolve(__dirname, 'src')
+    }, {
+      // 生成文件 file.png，输出到输出目录并返回 public URL
+      test: /\.(jpg|png|gif)$/,
+      use: {
+        loader: 'url-loader',
+        options: {
+          // name: '[path][hash][name].[ext]'
+          name: '[name].[ext]',
+          // 超过多少就不用base64
+          limit: 9000,
+          outputPath: 'img/'
+          // publicPath: '/'
+        }
+      },
+      include: path.resolve(__dirname, 'src')
+    }]
+  },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: 'src/index.pug',
+      filename: 'index.html',
+      chunks: ['index']
+    }),
+    new HtmlWebpackPlugin({
+      template: 'src/math.html',
+      filename: 'math.html',
+      chunks: ['math']
+    }),
+  ],
+}
+module.exports = options
+
+```
+
+```js
+// webpack.prod.js
+const merge = require('webpack-merge')
+const common = require('./webpack.common.js')
+const path = require('path')
+
+var options = {
+  module: {
+    rules: [{
+      test: /\.css$/,
+      use: ['style-loader', {
+        loader: 'css-loader',
+        options: {
+          importLoaders: 1
+        }
+      }, 'postcss-loader'],
+      include: path.resolve(__dirname, 'src')
+    }]
+  },
+  plugins: [],
+  // 增加source-map,容易找到报错所在地
+  devtool: 'inline-source-map',
+  // 设置本地服务器的根目录  webpack-dev-server --open  代码变动自动编译且没有生成dist
+  devServer: {
+    contentBase: './dist'
+    // hot: true
+  }
+}
+module.exports = merge(common, options)
+
+```
+
+```js
+// webpack.prod.js
+const merge = require('webpack-merge')
+const common = require('./webpack.common.js')
+const path = require('path')
+const webpack = require('webpack')
+// 分离css
+const ExtractTextPlugin = require("extract-text-webpack-plugin")
+// 每次运行命令的时候 先清除dist的其他文件
+const CleanWebpackPlugin = require('clean-webpack-plugin')
+// treeShaking
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
+
+
+var options = {
+  module: {
+    rules: [{
+      // es5+的转化
+      test: /\.js$/,
+      use: {
+        loader: 'babel-loader'
+      },
+      include: path.resolve(__dirname, 'src')
+      // 提取css
+    },{
+      test: /\.css$/,
+      use: ExtractTextPlugin.extract({
+        // 没有塞进css文件的还是放到style标签
+        fallback: "style-loader",
+        use: [{ loader: 'css-loader', options: { importLoaders: 1 } },'postcss-loader'],
+        // 这样css中引用背景图片的时候 ../img/i.png而不是默认的./img/i.png
+        publicPath: '../'
+      }),
+      include: path.resolve(__dirname, 'src')
+    }]
+  },
+  plugins: [
+    // name就是chunk名,单入口可以定义,多入口可以这样的
+    new ExtractTextPlugin('css/[name].css'),
+    // treeshaking  压缩加减少代码
+    new UglifyJSPlugin(),
+    // 生产环境的全局变量 js中可以使用 process.env.NODE_ENV === 'production'
+    new webpack.DefinePlugin({
+      'process.env': {
+        'NODE_ENV': JSON.stringify('production')
+      }
+    })
+  ]
+}
+module.exports = merge(common, options)
+
+```
+
+配置脚本`package.json`
+
+```js
+"start": "webpack-dev-server --open --config webpack.dev.js",
+"dev": "webpack-dev-server --open --config webpack.dev.js",
+"build": "webpack --config webpack.prod.js",
+```
