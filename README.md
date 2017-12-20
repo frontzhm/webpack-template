@@ -693,3 +693,50 @@ module.exports = merge(common, options)
 "dev": "webpack-dev-server --open --config webpack.dev.js",
 "build": "webpack --config webpack.prod.js",
 ```
+
+## 增加请求接口的代理
+
+本地请求接口特别麻烦,总是会404
+找到[devserver-proxy](https://doc.webpack-china.org/configuration/dev-server/#devserver-proxy)
+用的是[http-proxy-middleware](https://github.com/chimurai/http-proxy-middleware)
+
+```js
+devServer: {
+    contentBase: './dist',
+    proxy:{
+      // url: '/test/testFetch/Login.php' => url: 'http://localhost/test/testFetch/Login.php'
+      // '/'表示请求的任意路径都会转向下面的域名 也就是  /\//.test(path)就转向下面的域名且后面路径不变
+      '/':{
+        target: 'http://test.yv.com',
+        changeOrigin: true,
+        secure: true,
+        // pathRewrite 是匹配转向的链接的路径 也就是  url.path.replace(key,value)
+        pathRewrite: {'^/activity-lagou' : ''}
+      }
+    }
+    // hot: true
+  }
+```
+
+假设你请求的接口路径是requestPath,  '/'相当于你的  `/\//.test(requestPath)`一旦匹配成功就转向代理,且你请求的路径不变,也就是只是域名变化 ,如`http://localhost:8080/api/getlist`相当于`http://test.yv.com/api/getlist`
+
+* proxy({...}) - matches any path, all requests will be proxied.
+* proxy('/', {...}) - matches any path, all requests will be proxied.
+* proxy('/api', {...}) - matches paths starting with /api
+
+pathRewrite这个属性是针对转向后的链接,假设转向后的链接是 realPath ,那么 realPath.replace(key,pathRewrite.key)
+如`'^/activity-lagou' : ''`就相当于链接是`http://test.yv.com//activity-lagou/getlist`会被写成`http://test.yv.com/getlist`
+
+借用个插件`npm  install axios --save`
+
+```js
+// index.js里请求, 这样请求会自动转到设置的域名
+axios.get('/activity-lagou/get-lg-code.html')
+  .then(function (response) {
+    console.log(response);
+  })
+  .catch(function (error) {
+    console.log(error);
+  });
+```
+
