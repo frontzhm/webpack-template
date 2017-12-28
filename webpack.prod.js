@@ -9,7 +9,7 @@ const CleanWebpackPlugin = require('clean-webpack-plugin')
 // treeShaking
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 
-
+const { projectName } = require('./project.config')
 var options = {
   module: {
     rules: [{
@@ -18,7 +18,7 @@ var options = {
       use: {
         loader: 'babel-loader'
       },
-      include: path.resolve(__dirname, 'src')
+      include: path.resolve(__dirname, 'src', projectName)
       // 提取css
     },{
       test: /\.css$/,
@@ -29,10 +29,12 @@ var options = {
         // 这样css中引用背景图片的时候 ../img/i.png而不是默认的./img/i.png
         publicPath: '../'
       }),
-      include: path.resolve(__dirname, 'src')
+      include: path.resolve(__dirname, 'src', projectName)
     }]
   },
   plugins: [
+    // 清除dist
+    new CleanWebpackPlugin(['dist/'+ projectName]),
     // name就是chunk名,单入口可以定义,多入口可以这样的
     new ExtractTextPlugin('css/[name].css'),
     // treeshaking  压缩加减少代码
