@@ -3,8 +3,8 @@ const path = require('path')
 
 // 默认每个项目的entry 是各自的pug文件名,且生成的js也是如此
 // dist的目录机构是项目名划分文件夹
-const getPugsName = dir => {
-  dir = fs.readdirSync('src/hello-world')
+const getPugsName = (projectName) => {
+  const dir = fs.readdirSync(`src/${projectName}` )
   return dir.filter(item => path.extname(item) === '.pug')
     .map(item => path.basename(item,'.pug'))
 }
@@ -12,7 +12,7 @@ const getPugsName = dir => {
 const getEntry = (pugNames,projectName) => {
   let obj = {}
   pugNames.forEach(item => {
-    obj[item] = path.resolve(__dirname, 'src', projectName, `${item}.js`)
+    obj[item] = path.resolve(__dirname, 'src', projectName, 'js', `${item}.js`)
   })
   return obj
 }
@@ -34,15 +34,19 @@ const allProjects = [
   // 0
   {
     projectName: 'hello-world'
-  }
+  },
+  // 1
+  {
+    projectName: 'activity-gn'
+  },
 
 ]
 allProjects.forEach(item => {
-  item.pugNames = getPugsName('src/' + item.projectName)
+  item.pugNames = getPugsName(item.projectName)
   item.entry = getEntry(item.pugNames,item.projectName)
   item.htmlWebpackPluginsOptions = getHtmlWebpackPluginsOptions(item.pugNames,item.projectName)
 
 })
-// console.log(allProjects)
+console.log(allProjects)
 // 编辑哪个项目,将索引改成相应的即可
-module.exports = allProjects[0]
+module.exports = allProjects[1]

@@ -2,5 +2,5 @@ $red:red;
 body{
   color:red;
   font-size: 40px;
-  background: url('./img/3.jpg')
+  background: url('../img/3.jpg')
 }
